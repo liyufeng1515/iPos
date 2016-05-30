@@ -1,0 +1,5 @@
+{
+  "name": "iPosApp",
+  "app_id": "",
+  "watchPetterns":["www/*"]
+}

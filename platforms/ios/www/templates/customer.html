@@ -1,0 +1,43 @@
+<ion-view view-title="客户列表">
+  <ion-content>
+    <div class="card">
+      <div class="list">
+        <button class="item item-icon-left col-20">
+          新增客户
+          <i class="icon ion-person-add"></i>
+        </button>
+        <div class="item item-input-inset">
+          <label class="item-input-wrapper col-20">
+            <input type="text" placeholder="客户编号">
+          </label>
+          <label>&nbsp;&nbsp;</label>
+          <label class="item-input-wrapper col-20">
+            <input type="text" placeholder="客户名称">
+          </label>
+          <button class="button button-small col-10">
+            <h3>查 询</h3>
+          </button>
+        </div>
+        <div class="item">
+          <div class="list">
+            <div class="item item-stable row">
+              <div class="col">客户名称</div>
+              <div class="col">会员卡号</div>
+              <div class="col">联系电话</div>
+              <div class="col">积分</div>
+              <div class="col">创建日期</div>
+            </div>
+            <div class="item row" ng-repeat="customer in customerList">
+              <div class="col">{{customer.lastName=='null'?'':customer.lastName}}{{customer.firstName=='null'?'':customer.firstName}}</div>
+              <div class="col">{{customer.cardId=='null'?'':customer.cardId}}</div>
+              <div class="col">{{customer.contactNumber=='null'?'':customer.contactNumber}}</div>
+              <div class="col">{{customer.availableBalanceTotal=='null'?0:customer.availableBalanceTotal}}({{customer.actualBalanceTotal=='null'?0:customer.actualBalanceTotal}})</div>
+              <div class="col">{{customer.createdDate}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>
+

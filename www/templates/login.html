@@ -1,0 +1,28 @@
+<ion-view view-title="Login">
+  <ion-content>
+    <div class="bar bar-header bar-light">
+      <h1 class="title">iPos / ZUCZUG</h1>
+    </div>
+    <div class="content has-header">
+      <form ng-submit="doLogin()">
+        <div class="list">
+          <label class="item item-input">
+            <span class="input-label text-center">Username</span>
+            <input type="text" ng-model="loginData.USERNAME">
+          </label>
+          <label class="item item-input text-center">
+            <span class="input-label">Password</span>
+            <input type="password" ng-model="loginData.PASSWORD">
+          </label>
+          <label class="item item-input text-center">
+            <span class="input-label">Tenant ID</span>
+            <input type="password" ng-model="loginData.tenantId">
+          </label>
+          <label class="item">
+            <button class="button button-block button-dark" type="submit">登 录</button>
+          </label>
+        </div>
+      </form>
+    </div>
+  </ion-content>
+</ion-view>
