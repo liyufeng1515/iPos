@@ -1,6 +1,8 @@
 angular.module('iPosApp.controllers',[])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($rootScope, $scope, $ionicModal, $timeout) {
+  //init pos data
+  $rootScope.cartProducts = [];
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -40,10 +42,50 @@ angular.module('iPosApp.controllers',[])
     }, 1000);
   };
 })
-  .controller('HomeCtrl',function($http,$scope,CatalogService){
+  .controller('HomeCtrl',function($http,$scope,$rootScope,CartService){
+    $scope.customer = $rootScope.customer;
+    $scope.cartProducts = $rootScope.cartProducts;
+    $scope.mainNum = ".";
+    $scope.calculator = function(str){
+      if("-"==str){
+        alert("暂不支持此字符");
+      }else if("clr"==str){
+        $scope.mainNum = ".";
+      }else if("del"==str){
+        if($scope.mainNum.length==1){
+          $scope.mainNum = ".";
+        }else{
+          $scope.mainNum = $scope.mainNum.substring(0,$scope.mainNum.length-1);
+        }
+      }else{
+        if($scope.mainNum&&$scope.mainNum.indexOf(".")>=0)
+          $scope.mainNum = $scope.mainNum.replace(".","");
+        $scope.mainNum+=str;
+      }
+    }
 
-
+    $scope.checkout = function(){
+      var demoData = {checkOutPaymentIdInfo:'CASH',preTotal_CASH:652.5}
+      var promise = CartService.checkout(demoData);
+      promise.then(function(data){
+        //TODO 成功消息提示
+        var reg = new RegExp('^[0-9]*$');
+        if(reg.test($scope.mainNum)){
+          alert(1);
+        }
+        var demoData = {facilityId:'ZUCZUG_CLOTHESFACILITY'};
+        var promise = CartService.createOrder(demoData);
+        promise.then(function(data){
+          //TODO 成功消息提示
+        },function(data){
+          PopupService.errorMessage("创建出现错误,检查网络,或稍候重试."+data);
+        });
+      },function(data){
+        PopupService.errorMessage("支付出现错误,检查网络,或稍候重试."+data);
+      });
+    }
   })
+
   .controller('LoginCtrl',function($http,$scope,$state,PopupService,LoginService){
     $scope.loginData = {};
     $scope.doLogin = function() {
@@ -70,31 +112,17 @@ angular.module('iPosApp.controllers',[])
     };
   })
 
-  .controller('CatalogCtrl',function($http,$scope,$ionicModal,CatalogService){
+  .controller('CatalogCtrl',function($state,$rootScope,$scope,$ionicModal,PopupService,CatalogService,CartService){
     //TODO hard code productStoreId
     var data = {productStoreId:'SHOWROOM-161-E'};
     var promise = CatalogService.findCatalogAndProduct(data);
     promise.then(
       function(data){
         $scope.catalogList = data.listIt;
-        //alert(data.listIt[0].prodCatalogId);
-
       },
       function(data){
-        //TODO alert warn message
+        PopupService.errorMessage("查找目录商品出现错误,检查网络,或稍候重试."+data);
       });
-    /*$scope.showCatalog={};
-    $scope.showCatalog.prodCatalogId="TEST";
-    $scope.contact = {
-      name: 'Mittens Cat',
-      info: 'Tap anywhere on the card to open the modal'
-    }
-    $ionicModal.fromTemplateUrl("categoryMembers.html", {
-      scope: $scope,
-      animation: 'slide-in-up'
-    }).then(function(modal) {
-      $scope.modal = modal;
-    });*/
 
     $scope.openModal = function(it) {
       $scope.showCatalog = it;
@@ -111,43 +139,23 @@ angular.module('iPosApp.controllers',[])
       $scope.modal.remove();
     };
     $scope.addProcutToCart = function(it){
-      alert(it.productId);
+      var demoData = {quantity:1,add_product_id:'E161BA06-10-F'};
+      var promise = CartService.addProcutToCart(demoData);
+      promise.then(
+        function(data){
+          //TODO 成功消息提示
+          $rootScope.cartProducts.push(it);
+        }, function(data){
+          PopupService.errorMessage("添加商品出现错误,检查网络,或稍候重试."+data);
+        });
     }
-    // Cleanup the modal when we're done with it!
-    /*$scope.$on('$destroy', function() {
-      $scope.modal.remove();
-    });*/
-    // Execute action on hide modal
-    /*$scope.$on('modal.hidden', function() {
-      // Execute action
-    });*/
-    // Execute action on remove modal
-    /*$scope.$on('modal.removed', function() {
-      // Execute action
-    });*/
-
-  })
-  .controller('CatalogTabsCtrl',function($http,$scope,$ionicTabsDelegate,CatalogService){
-    //TODO hard code productStoreId
-    var data = {productStoreId:'SHOWROOM-161-E'};
-    var promise = CatalogService.findCatalogAndProduct(data);
-    promise.then(
-      function(data){
-        $scope.catalogList = data.listIt;
-        //alert(data.listIt[0].prodCatalogId);
-
-      },
-      function(data){
-        //TODO alert warn message
-      });
-
-      $scope.selectTabWithIndex = function(index) {
-        alert(index);
-        $ionicTabsDelegate.select(index);
-      }
+    $scope.$on('modal.removed', function() {
+      if($rootScope.cartProducts.length!=0)
+        $state.go("app.home",{},{reload:true});
+    });
   })
 
-  .controller('CustomerCtrl',function($rootScope,$http,$scope,CustomerService,CartService){
+  .controller('CustomerCtrl',function($state,$rootScope,$http,$scope,CustomerService,CartService,PopupService){
     //demo data
     var demoData = {"timecardAccountTypeId":"null","cardId":"null","lastName":"null","partyClassificationGroupId":"CommonClassification","contactNumber":"13962428310","groupName":"如是学","classThruDate":"null","availableBalanceTotal":"null","partyTypeId":"PARTY_GROUP","actualBalanceTotal":"null","roleTypeId":"CUSTOMER","partyId":"198736","description":"SHOWROOM客户类型","classFromDate":"2016-04-11 14:13:20.0","timecardAccountId":"null","firstName":"如是学","createdDate":"2016-04-11 14:13:20.0","ownerPartyId":"null"}
     //TODO hard code productStoreId
@@ -159,48 +167,22 @@ angular.module('iPosApp.controllers',[])
         $scope.customerList = data.listIt;
       },
       function(data){
-        //TODO alert warn message
+        PopupService.errorMessage("查找客户出现错误,检查网络,或稍候重试."+data);
       });
     $scope.setCustomerToCart = function(customer){
-      alert(1);
       //var data = {'partyId':customer.partyId};
+      var demoCustomer = {"timecardAccountTypeId":"null","cardId":"null","lastName":"null","partyClassificationGroupId":"CommonClassification","contactNumber":"13333333333","groupName":"测试客户2","classThruDate":"null","availableBalanceTotal":"null","partyTypeId":"PARTY_GROUP","actualBalanceTotal":"null","roleTypeId":"CUSTOMER","partyId":"198721","description":"SHOWROOM客户类型","classFromDate":"2016-04-06 14:33:25.0","timecardAccountId":"null","firstName":"测试客户2","createdDate":"2016-04-06 14:33:25.0","ownerPartyId":"null"};
+      var demoData = {'partyId':demoCustomer.partyId};;
       var promise = CartService.setCustomerToCart(demoData);
       promise.then(
         function(data){
-          alert("..."+data);
-          $rootScope.customer=customer;
+          //TODO data message
+          $rootScope.customer=demoCustomer;
+          $state.go("app.home",{}, {reload:true});
         },
         function(data){
-          alert(data);
-          //TODO alert warn message
+          PopupService.errorMessage("选择客户出现错误,检查网络,或稍候重试."+data);
         });
-      /*$http({
-        method: 'POST',
-        url: 'SetPosPartyToCart',
-        data: formData
-      }).success(function(response){
-        /!*if(getErrorMessage(response)){
-          alertService.add('danger', getErrorMessage(response));
-          return;
-        }*!/
-        //$('#FindCustomer').modal('hide');
-        //$scope.cartCustomers.push(customer);
-        $rootScope.customer=customer;
-      });*/
     }
   })
-
-/*.controller('PlaylistsCtrl', function($scope) {
-  $scope.playlists = [
-    { title: 'Reggae', id: 1 },
-    { title: 'Chill', id: 2 },
-    { title: 'Dubstep', id: 3 },
-    { title: 'Indie', id: 4 },
-    { title: 'Rap', id: 5 },
-    { title: 'Cowbell', id: 6 }
-  ];
-})
-
-.controller('BrowCtrl', function($scope, $stateParams) {
-})*/
 ;

@@ -35,6 +35,7 @@ angular.module('iPosApp', ['ionic','iPosApp.controllers','ngResource','iPosApp.s
 
       .state('app.home',{
         url: '/home',
+        cache:false,
         views: {
           'menuContent':{
             templateUrl: 'templates/home.html',
@@ -49,16 +50,6 @@ angular.module('iPosApp', ['ionic','iPosApp.controllers','ngResource','iPosApp.s
           'menuContent':{
             templateUrl: 'templates/catalog.html',
             controller: 'CatalogCtrl'
-          }
-        }
-      })
-
-      .state('app.catalogTabs',{
-        url: '/catalogTabs',
-        views: {
-          'menuContent':{
-            templateUrl: 'templates/catalogTabs.html',
-            controller: 'CatalogTabsCtrl'
           }
         }
       })
