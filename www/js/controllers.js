@@ -3,6 +3,7 @@ angular.module('iPosApp.controllers',[])
 .controller('AppCtrl', function($rootScope, $scope, $ionicModal, $timeout) {
   //init pos data
   $rootScope.cartProducts = [];
+  $rootScope.customer = {};
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -42,51 +43,123 @@ angular.module('iPosApp.controllers',[])
     }, 1000);
   };
 })
-  .controller('HomeCtrl',function($http,$scope,$rootScope,CartService){
-    $scope.customer = $rootScope.customer;
-    $scope.cartProducts = $rootScope.cartProducts;
-    $scope.mainNum = ".";
+  .controller('HomeCtrl',function($scope,$rootScope,$state,PopupService,CartService,ServiceUtil,ValidateUtil){
+    //init scope data //TODO demo data
+    $scope.paymentTypeList = [
+      { text: "现金", value: "CASH" },
+      { text: "demo别选我", value: "CASH1" },
+      { text: "demo别选我2", value: "CASH2" },
+    ];
+    $scope.facilityIdList = [
+      { text: "成衣仓", value: "ZUCZUG_CLOTHESFACILITY" },
+      { text: "demo别选我3", value: "ZUCZUG_CLOTHESFACILITY3" },
+    ];
+    $scope.initCartData = function(){
+      $scope.cart = {
+        facilityId:'ZUCZUG_CLOTHESFACILITY',
+        checkOutPaymentIdInfo:'CASH',
+        mainNum:".",
+        customer:$rootScope.customer,
+        cartProducts:$rootScope.cartProducts
+      };
+    }
+    $scope.initCartData();
+    $scope.showCartDetail = function(){
+      $scope.cartDetail = true;
+    }
+    $scope.closeCartDetail = function(){
+      $scope.cartDetail = false;
+    }
     $scope.calculator = function(str){
-      if("-"==str){
-        alert("暂不支持此字符");
-      }else if("clr"==str){
-        $scope.mainNum = ".";
+      if("clr"==str){
+        $scope.cart.mainNum = ".";
       }else if("del"==str){
-        if($scope.mainNum.length==1){
-          $scope.mainNum = ".";
+        if($scope.cart.mainNum.length==1){
+          $scope.cart.mainNum = ".";
         }else{
-          $scope.mainNum = $scope.mainNum.substring(0,$scope.mainNum.length-1);
+          $scope.cart.mainNum = $scope.cart.mainNum.substring(0,$scope.cart.mainNum.length-1);
+        }
+      }else if("."==str){
+        if($scope.cart.mainNum.indexOf(".")>=0){
+          PopupService.errorMessage("无效的数字.");
+        }else{
+          $scope.cart.mainNum+=str;
         }
       }else{
-        if($scope.mainNum&&$scope.mainNum.indexOf(".")>=0)
-          $scope.mainNum = $scope.mainNum.replace(".","");
-        $scope.mainNum+=str;
+        if(0==str&&$scope.cart.mainNum.indexOf("0")==0&&$scope.cart.mainNum.indexOf(".")!=1){
+          PopupService.errorMessage("无效的数字.");
+          return false;
+        }else if('00'==str&&$scope.cart.mainNum.indexOf(".")==0){
+          PopupService.errorMessage("无效的数字.");
+          return false;
+        }
+        if($scope.cart.mainNum.indexOf(".")==0){
+          $scope.cart.mainNum = $scope.cart.mainNum.replace(".","");
+        }else if($scope.cart.mainNum.indexOf("0")==0&&$scope.cart.mainNum.indexOf(".")!=1){
+          $scope.cart.mainNum = $scope.cart.mainNum.replace("0","");
+        }
+        $scope.cart.mainNum+=str;
       }
     }
-
+    $scope.goCustomerPage = function(){
+      $state.go("app.customer",{},{reload:true});
+    }
+    $scope.createOrder = function(){
+      //validate cusomer/product
+      if(Object.keys($scope.cart.customer).length==0||$scope.cart.cartProducts.length==0){
+        PopupService.errorMessage("请添加客户/商品到您的购物车,再尝试结算.");
+        return false;
+      }
+       var data = {facilityId:$scope.cart.facilityId};
+       var promise = CartService.createOrder(data);
+       promise.then(function(data){
+         if(ServiceUtil.isError(data)){
+           PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+           return false;
+         }
+         PopupService.successMessage("创建订单成功.");
+         //clear/init data
+         $scope.closeCartDetail();
+         $rootScope.customer = {};
+         $rootScope.cartProducts = [];
+         $scope.initCartData();
+       },function(data){
+        PopupService.errorMessage("创建出现错误,检查网络,或稍候重试."+data);
+       });
+    }
     $scope.checkout = function(){
-      var demoData = {checkOutPaymentIdInfo:'CASH',preTotal_CASH:652.5}
-      var promise = CartService.checkout(demoData);
-      promise.then(function(data){
-        //TODO 成功消息提示
-        var reg = new RegExp('^[0-9]*$');
-        if(reg.test($scope.mainNum)){
-          alert(1);
-        }
-        var demoData = {facilityId:'ZUCZUG_CLOTHESFACILITY'};
-        var promise = CartService.createOrder(demoData);
-        promise.then(function(data){
-          //TODO 成功消息提示
-        },function(data){
-          PopupService.errorMessage("创建出现错误,检查网络,或稍候重试."+data);
+      //validate cusomer/product
+      if(Object.keys($scope.cart.customer).length==0||$scope.cart.cartProducts.length==0){
+        PopupService.errorMessage("请添加客户/商品到您的购物车,再尝试结算.");
+        return false;
+      }
+      //validate amout
+      if(ValidateUtil.isNumber($scope.cart.mainNum)){
+        var checkoutConfirm = PopupService.confirmMessage("当前支付方式为:"+$scope.cart.checkOutPaymentIdInfo+",确认支付吗?");
+        checkoutConfirm.then(function(data){
+          $scope.showCartDetail();
+          if(data){
+            var data = {checkOutPaymentIdInfo:$scope.cart.checkOutPaymentIdInfo,preTotal_CASH:$scope.cart.mainNum}
+            var promise = CartService.checkout(data);
+            promise.then(function(data){
+              if(ServiceUtil.isError(data)){
+                PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+                return false;
+              }
+              PopupService.successMessage("支付成功,请确认发货仓库并确认结算.");
+            },function(data){
+              PopupService.errorMessage("支付出现错误,检查网络,或稍候重试."+data);
+            });
+          }
         });
-      },function(data){
-        PopupService.errorMessage("支付出现错误,检查网络,或稍候重试."+data);
-      });
+      }else{
+        PopupService.errorMessage("请先输入正确金额.");
+        return false;
+      }
     }
   })
 
-  .controller('LoginCtrl',function($http,$scope,$state,PopupService,LoginService){
+  .controller('LoginCtrl',function($http,$scope,$state,PopupService,LoginService,ServiceUtil){
     $scope.loginData = {};
     $scope.doLogin = function() {
       if(Object.keys($scope.loginData).length ==0){
@@ -102,7 +175,9 @@ angular.module('iPosApp.controllers',[])
            if(data._LOGIN_PASSED_=="TRUE"){
              $state.go("app.home");
            }else if(data._ERROR_MESSAGE_){
-             PopupService.errorMessage(data._ERROR_MESSAGE_);
+             PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+           }else{
+             PopupService.errorMessage("网络异常."+data);
            }
          },
          function(data){
@@ -112,7 +187,7 @@ angular.module('iPosApp.controllers',[])
     };
   })
 
-  .controller('CatalogCtrl',function($state,$rootScope,$scope,$ionicModal,PopupService,CatalogService,CartService){
+  .controller('CatalogCtrl',function($state,$rootScope,$scope,$ionicModal,PopupService,CatalogService,CartService,ServiceUtil){
     //TODO hard code productStoreId
     var data = {productStoreId:'SHOWROOM-161-E'};
     var promise = CatalogService.findCatalogAndProduct(data);
@@ -143,7 +218,11 @@ angular.module('iPosApp.controllers',[])
       var promise = CartService.addProcutToCart(demoData);
       promise.then(
         function(data){
-          //TODO 成功消息提示
+          if(ServiceUtil.isError(data)){
+            PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+            return false;
+          }
+          PopupService.successMessage("成功添加商品到购物车.");
           $rootScope.cartProducts.push(it);
         }, function(data){
           PopupService.errorMessage("添加商品出现错误,检查网络,或稍候重试."+data);
@@ -155,29 +234,34 @@ angular.module('iPosApp.controllers',[])
     });
   })
 
-  .controller('CustomerCtrl',function($state,$rootScope,$http,$scope,CustomerService,CartService,PopupService){
-    //demo data
-    var demoData = {"timecardAccountTypeId":"null","cardId":"null","lastName":"null","partyClassificationGroupId":"CommonClassification","contactNumber":"13962428310","groupName":"如是学","classThruDate":"null","availableBalanceTotal":"null","partyTypeId":"PARTY_GROUP","actualBalanceTotal":"null","roleTypeId":"CUSTOMER","partyId":"198736","description":"SHOWROOM客户类型","classFromDate":"2016-04-11 14:13:20.0","timecardAccountId":"null","firstName":"如是学","createdDate":"2016-04-11 14:13:20.0","ownerPartyId":"null"}
+  .controller('CustomerCtrl',function($state,$rootScope,$http,$scope,CustomerService,CartService,PopupService,ServiceUtil){
     //TODO hard code productStoreId
     //var data = {productStoreId:'SHOWROOM-161-E'};
     var data = {viewIndex:0,viewSize:5};
     var promise = CustomerService.findCustomerWebPos(data);
     promise.then(
       function(data){
+        if(ServiceUtil.isError(data)){
+          PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+          return false;
+        }
         $scope.customerList = data.listIt;
       },
       function(data){
         PopupService.errorMessage("查找客户出现错误,检查网络,或稍候重试."+data);
       });
     $scope.setCustomerToCart = function(customer){
-      //var data = {'partyId':customer.partyId};
-      var demoCustomer = {"timecardAccountTypeId":"null","cardId":"null","lastName":"null","partyClassificationGroupId":"CommonClassification","contactNumber":"13333333333","groupName":"测试客户2","classThruDate":"null","availableBalanceTotal":"null","partyTypeId":"PARTY_GROUP","actualBalanceTotal":"null","roleTypeId":"CUSTOMER","partyId":"198721","description":"SHOWROOM客户类型","classFromDate":"2016-04-06 14:33:25.0","timecardAccountId":"null","firstName":"测试客户2","createdDate":"2016-04-06 14:33:25.0","ownerPartyId":"null"};
-      var demoData = {'partyId':demoCustomer.partyId};;
-      var promise = CartService.setCustomerToCart(demoData);
+      var data = {'partyId':customer.partyId};
+      //var demoCustomer = {"timecardAccountTypeId":"null","cardId":"null","lastName":"null","partyClassificationGroupId":"CommonClassification","contactNumber":"13333333333","groupName":"测试客户2","classThruDate":"null","availableBalanceTotal":"null","partyTypeId":"PARTY_GROUP","actualBalanceTotal":"null","roleTypeId":"CUSTOMER","partyId":"198721","description":"SHOWROOM客户类型","classFromDate":"2016-04-06 14:33:25.0","timecardAccountId":"null","firstName":"测试客户2","createdDate":"2016-04-06 14:33:25.0","ownerPartyId":"null"};
+      //var demoData = {'partyId':demoCustomer.partyId};;
+      var promise = CartService.setCustomerToCart(data);
       promise.then(
         function(data){
-          //TODO data message
-          $rootScope.customer=demoCustomer;
+          if(ServiceUtil.isError(data)){
+            PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+            return false;
+          }
+          $rootScope.customer=customer;
           $state.go("app.home",{}, {reload:true});
         },
         function(data){

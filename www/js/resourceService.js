@@ -125,8 +125,59 @@ angular.module("iPosApp.services",[])
           okType:"button-dark"
         });
         return popup;
+      },
+      successMessage:function(data){
+        var popup = $ionicPopup.alert({
+          title:"消息提示",
+          cssClass:"text-center",
+          template:data,
+          okType:"button-dark"
+        });
+        return popup;
+      },
+      confirmMessage:function(data){
+        var popup = $ionicPopup.confirm({
+          title:"消息确认提示",
+          template:data,
+        });
+        return popup;
       }
     }
   })
+  .service('ServiceUtil',function(){
+    return {
+      isError:function (data) {
+        if(data._ERROR_MESSAGE_||data._ERROR_MESSAGE_LIST_){
+          return true;
+        }else if(data.responseMessage&&"error"==data.responseMessage){
+          return true;
+        }else{
+          return false;
+        }
+      },
+      getErrorMessage:function(data){
+        if(data._ERROR_MESSAGE_){
+          return data._ERROR_MESSAGE_;
+        }else if(data._ERROR_MESSAGE_LIST_){
+          return data._ERROR_MESSAGE_LIST_;
+        }else if(data.errorMessage){
+          return data.errorMessage;
+        }
+      }
+    }
+  })
+    .service('ValidateUtil',function(){
+      return {
+        //金额正则
+        isNumber:function (data) {
+          var reg = /^(-)?(([1-9]{1}\d*)|([0]{1}))(\.(\d){1,2})?$/;
+          if(reg.test(data)){
+            return true;
+          }else{
+            return false;
+          }
+        }
+      }
+    })
 
 ;
