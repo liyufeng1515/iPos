@@ -1,1 +1,9 @@
 /* Empty. Add your own CSS if you like */
+/*override modal css*/
+.modal {
+    top: 10%;
+    right: 20%;
+    bottom: 20%;
+    left: 20%;
+    min-height: 500px;
+    width: 60%; }

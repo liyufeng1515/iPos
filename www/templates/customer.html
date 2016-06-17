@@ -2,7 +2,7 @@
   <ion-content>
     <div class="card">
       <div class="list">
-        <button class="item item-icon-left col-20">
+        <button class="item item-icon-left col-20" ng-click="editCustomer()">
           新增客户
           <i class="icon ion-person-add"></i>
         </button>
@@ -47,4 +47,39 @@
     </div>
   </ion-content>
 </ion-view>
+<script id="editCustomer.html" type="text/ng-template">
+  <ion-modal-view class="card">
+    <ion-header-bar class="stable-bg">
+      <h1 class="title">{{customer?'新增客户':'修改客户'}}</h1>
+      <button class="button button-icon ion-close-round" ng-click="closeModal()"></button>
+    </ion-header-bar>
+    <ion-tabs class="tabs-light tabs-top tabs-icon-left">
+      <ion-tab title="个 人 客 户" icon-on="ion-ios-person" icon-off="ion-ios-person-outline">
+        <ion-view>
+          <ion-content>
+            <div class="card list">
+              <div class="item item-input">
+                <input type="text" placeholder="联系人姓名"/>
+              </div>
+              <div class="item item-input">
+                <input type="text" placeholder="手机号码"/>
+              </div>
+              <div class="item row text-center">
+                <div class="col"><ion-radio ng-model="gender" ng-value="M">男</ion-radio></div>
+                <div class="col"><ion-radio ng-model="gender" ng-value="F">女</ion-radio></div>
+              </div>
+              <div class="item">1</div>
+            </div>
+            <div class="row">
+              <button class="button button-block button-dark" ng-click="editCustomer()">创 建 客 户</button>
+            </div>
+          </ion-content>
+        </ion-view>
+      </ion-tab>
 
+      <ion-tab title="企 业 客 户" icon-on="ion-ios-people" icon-off="ion-ios-people-outline">
+
+      </ion-tab>
+    </ion-tabs>
+  </ion-modal-view>
+</script>

@@ -234,7 +234,7 @@ angular.module('iPosApp.controllers',[])
     });
   })
 
-  .controller('CustomerCtrl',function($state,$rootScope,$http,$scope,CustomerService,CartService,PopupService,ServiceUtil){
+  .controller('CustomerCtrl',function($ionicModal,$state,$rootScope,$http,$scope,CustomerService,CartService,PopupService,ServiceUtil){
     //TODO hard code productStoreId
     //var data = {productStoreId:'SHOWROOM-161-E'};
     var data = {viewIndex:0,viewSize:5};
@@ -250,6 +250,19 @@ angular.module('iPosApp.controllers',[])
       function(data){
         PopupService.errorMessage("查找客户出现错误,检查网络,或稍候重试."+data);
       });
+    $ionicModal.fromTemplateUrl("editCustomer.html", {
+      scope: $scope,
+      animation: 'slide-in-up',
+      backdropClickToClose:false
+    }).then(function(modal) {
+      $scope.modal = modal;
+    });
+    $scope.editCustomer = function(customer){
+      $scope.modal.show();
+    }
+    $scope.closeModal = function(){
+      $scope.modal.hide();
+    }
     $scope.setCustomerToCart = function(customer){
       var data = {'partyId':customer.partyId};
       //var demoCustomer = {"timecardAccountTypeId":"null","cardId":"null","lastName":"null","partyClassificationGroupId":"CommonClassification","contactNumber":"13333333333","groupName":"测试客户2","classThruDate":"null","availableBalanceTotal":"null","partyTypeId":"PARTY_GROUP","actualBalanceTotal":"null","roleTypeId":"CUSTOMER","partyId":"198721","description":"SHOWROOM客户类型","classFromDate":"2016-04-06 14:33:25.0","timecardAccountId":"null","firstName":"测试客户2","createdDate":"2016-04-06 14:33:25.0","ownerPartyId":"null"};
