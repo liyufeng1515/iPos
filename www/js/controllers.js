@@ -235,6 +235,12 @@ angular.module('iPosApp.controllers',[])
   })
 
   .controller('CustomerCtrl',function($ionicModal,$state,$rootScope,$http,$scope,CustomerService,CartService,PopupService,ServiceUtil){
+    //test
+    $scope.datePickerCallback = function (val) {if (val) $scope.birthdayDate = val;};
+
+    $scope.closeModal1 = function(){
+      alert($scope.birthdayDate);
+    }
     //TODO hard code productStoreId
     //var data = {productStoreId:'SHOWROOM-161-E'};
     var data = {viewIndex:0,viewSize:5};

@@ -1,4 +1,4 @@
-angular.module('iPosApp', ['ionic','iPosApp.controllers','ngResource','iPosApp.services'])
+angular.module('iPosApp', ['ionic','iPosApp.controllers','ngResource','iPosApp.services','ionic-datepicker'])
 
   .run(function($ionicPlatform) {
     $ionicPlatform.ready(function() {

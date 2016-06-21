@@ -1,5 +1,5 @@
 /* Empty. Add your own CSS if you like */
-/*override modal css*/
+/*override ionic modal css*/
 .modal {
     top: 10%;
     right: 20%;
@@ -7,3 +7,8 @@
     left: 20%;
     min-height: 500px;
     width: 60%; }
+/*override datepicker css*/
+._720kb-datepicker-calendar._720kb-datepicker-open,._720kb-datepicker-calendar._720kb-datepicker-forced-to-open {
+    visibility: visible;
+    position:relative;
+}

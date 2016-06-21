@@ -68,10 +68,14 @@
                 <div class="col"><ion-radio ng-model="gender" ng-value="M">男</ion-radio></div>
                 <div class="col"><ion-radio ng-model="gender" ng-value="F">女</ion-radio></div>
               </div>
-              <div class="item">1</div>
+              <div class="item">
+                <ionic-datepicker date="pickDate" callback="datePickerCallback">
+                  <button class="button button-block button-calm"> 选择生日: {{ birthdayDate | date:'yyyy-MM-dd' }}</button>
+                </ionic-datepicker>
+              </div>
             </div>
             <div class="row">
-              <button class="button button-block button-dark" ng-click="editCustomer()">创 建 客 户</button>
+              <button class="button button-block button-dark" ng-click="closeModal1()">创 建 客 户</button>
             </div>
           </ion-content>
         </ion-view>
