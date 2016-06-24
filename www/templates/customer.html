@@ -59,30 +59,96 @@
           <ion-content>
             <div class="card list">
               <div class="item item-input">
-                <input type="text" placeholder="联系人姓名"/>
+                <input type="text" ng-model="newCustomer.personName" placeholder="联系人姓名" REQUIRED/>
               </div>
               <div class="item item-input">
-                <input type="text" placeholder="手机号码"/>
+                <input type="text" ng-model="newCustomer.contactNumber" maxlength="11" placeholder="手机号码" REQUIRED/>
               </div>
               <div class="item row text-center">
-                <div class="col"><ion-radio ng-model="gender" ng-value="M">男</ion-radio></div>
-                <div class="col"><ion-radio ng-model="gender" ng-value="F">女</ion-radio></div>
+                <div class="col"><ion-radio name="genderRadio" ng-model="newCustomer.gender" ng-value="'M'">男</ion-radio></div>
+                <div class="col"><ion-radio name="genderRadio" ng-model="newCustomer.gender" ng-value="'F'">女</ion-radio></div>
               </div>
               <div class="item">
                 <ionic-datepicker date="pickDate" callback="datePickerCallback">
-                  <button class="button button-block button-calm"> 选择生日: {{ birthdayDate | date:'yyyy-MM-dd' }}</button>
+                  <button class="button button-block button-calm"> 选择生日: {{ newCustomer.birthDate | date:'yyyy-MM-dd' }}</button>
                 </ionic-datepicker>
               </div>
             </div>
             <div class="row">
-              <button class="button button-block button-dark" ng-click="closeModal1()">创 建 客 户</button>
+              <button class="button button-block button-dark" ng-click="createCustomer()">创 建 客 户</button>
             </div>
           </ion-content>
         </ion-view>
       </ion-tab>
 
       <ion-tab title="企 业 客 户" icon-on="ion-ios-people" icon-off="ion-ios-people-outline">
-
+        <ion-view>
+          <ion-content>
+            <div class="card list">
+              <div class="item row">
+                &nbsp;&nbsp;&nbsp;
+                <div class="col col-25 item-input stable-bg">
+                  <input type="text" ng-model="newCustomer.company" placeholder=" 企业名称" REQUIRED/>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <div class="col col-25 item-input stable-bg">
+                  <input type="text" ng-model="newCustomer.webAddress" placeholder=" 企业网址" REQUIRED/>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <div class="col col-40 item-input stable-bg">
+                  <input type="text" ng-model="newCustomer.address" placeholder=" 企业地址" REQUIRED/>
+                </div>
+              </div>
+              <div class="item row button-large">
+                <div class="col item-select">
+                  选择省份:
+                  <select ng-model="newCustomer.province" ng-options="geo.geoId as geo.geoName for geo in provinceList" REQUIRED>
+                  </select>
+                </div>
+                <div class="col item-select">
+                  选择城市:
+                  <select ng-model="newCustomer.city" ng-options="geo.geoId as geo.geoName for geo in cityList" REQUIRED>
+                  </select>
+                </div>
+                <div class="col item-select">
+                  选择区县:
+                  <select ng-model="newCustomer.county" ng-options="geo.geoId as geo.geoName for geo in countyList" REQUIRED>
+                  </select>
+                </div>
+              </div>
+              <div class="item row">
+                &nbsp;&nbsp;&nbsp;
+                <div class="col col-25 item-input stable-bg">
+                  <input type="text" ng-model="newCustomer.position" placeholder=" 企业职位" REQUIRED/>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <div class="col col-25 item-input stable-bg">
+                  <input type="text" ng-model="newCustomer.personName" placeholder=" 联系人姓名" REQUIRED/>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <div class="col col-40 item-input stable-bg">
+                  <input type="text" ng-model="newCustomer.contactNumber" maxlength="11" placeholder=" 手机号码" REQUIRED/>
+                </div>
+              </div>
+              <div class="item row text-center">
+                <div class="col col-20 col-center">
+                  <ion-radio name="comGenRadio" ng-model="newCustomer.gender" ng-value="'M'">男</ion-radio>
+                </div>
+                <div class="col col-20 col-center">
+                  <ion-radio name="comGenRadio" ng-model="newCustomer.gender" ng-value="'F'">女</ion-radio>
+                </div>
+                <div class="col col-50 col-center">
+                  <ionic-datepicker date="pickDate" callback="datePickerCallback">
+                  <button class="button button-block button-calm"> 选择生日: {{ newCustomer.birthDate | date:'yyyy-MM-dd' }}</button>
+                </ionic-datepicker>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <button class="button button-block button-dark" ng-click="createCustomer('com')">创 建 企 业 客 户</button>
+            </div>
+          </ion-content>
+        </ion-view>
       </ion-tab>
     </ion-tabs>
   </ion-modal-view>

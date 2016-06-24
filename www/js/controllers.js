@@ -5,6 +5,18 @@ angular.module('iPosApp.controllers',[])
   $rootScope.cartProducts = [];
   $rootScope.customer = {};
 
+  $rootScope.initCartProducts = function(data){
+    var itemIndex  = -1;
+    angular.forEach($rootScope.cartProducts,function(it,index,array){
+      if(it.productId == data.productId) itemIndex = index;
+    });
+    if(itemIndex==-1){
+      data['quantity']=1;
+      $rootScope.cartProducts.push(data);
+    }else{
+      $rootScope.cartProducts[itemIndex].quantity += 1;
+    }
+  }
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -223,7 +235,7 @@ angular.module('iPosApp.controllers',[])
             return false;
           }
           PopupService.successMessage("成功添加商品到购物车.");
-          $rootScope.cartProducts.push(it);
+          $rootScope.initCartProducts(it);
         }, function(data){
           PopupService.errorMessage("添加商品出现错误,检查网络,或稍候重试."+data);
         });
@@ -234,17 +246,57 @@ angular.module('iPosApp.controllers',[])
     });
   })
 
-  .controller('CustomerCtrl',function($ionicModal,$state,$rootScope,$http,$scope,CustomerService,CartService,PopupService,ServiceUtil){
-    //test
-    $scope.datePickerCallback = function (val) {if (val) $scope.birthdayDate = val;};
+  .controller('CustomerCtrl',function($filter,$ionicModal,$state,$rootScope,$http,$scope,CustomerService,CartService,PopupService,GeoService,ServiceUtil,ValidateUtil){
+    //init data
+    $scope.initNewCustomerData = function(){
+      $scope.newCustomer = {gender:'F'};
+    }
+    $scope.initNewCustomerData();
+    var promise = GeoService.getProvinceGeo();
+    promise.then(function(data){
+      if(ServiceUtil.isError(data)){
+        PopupService.errorMessage('获取省份列表失败,检查网络或稍候重试.'+data);
+        return false;
+      }
+      $scope.provinceList = data.geoInfoList;
+    },function(data){
+      PopupService.errorMessage('获取省份列表失败,检查网络或稍候重试.');
+    });
+    //watch data
+    $scope.$watch('newCustomer.province', function(newVal) {
+      if(newVal)GeoService.getCityGeo({geoId:newVal}).then(function(data){$scope.cityList=data.geoInfoList;$scope.countyList={};});
+    });
+    $scope.$watch('newCustomer.city', function(newVal) {
+      if(newVal)GeoService.getCountyGeo({geoId:newVal}).then(function(data){$scope.countyList=data.geoInfoList;});
+    });
+    //date call back
+    $scope.datePickerCallback = function (val) {if (val) $scope.newCustomer.birthDate = $filter('date')(val,'yyyy-MM-dd');}
 
-    $scope.closeModal1 = function(){
-      alert($scope.birthdayDate);
+    $scope.createCustomer = function(data){
+      if(data&&ValidateUtil.isEmpty($scope.newCustomer.company)){PopupService.errorMessage("请录入企业客户名称.");return false;}
+      if(data&&ValidateUtil.isEmpty($scope.newCustomer.province)){PopupService.errorMessage("请录入所属省份.");return false;}
+      if(data&&ValidateUtil.isEmpty($scope.newCustomer.city)){PopupService.errorMessage("请录入所属城市.");return false;}
+      if(data&&ValidateUtil.isEmpty($scope.newCustomer.county)){PopupService.errorMessage("请录入所属区县.");return false;}
+      if(data&&ValidateUtil.isEmpty($scope.newCustomer.address)){PopupService.errorMessage("请录入企业联系地址.");return false;}
+      if(ValidateUtil.isEmpty($scope.newCustomer.personName)){PopupService.errorMessage("请录入联系人姓名.");return false;}
+      if(ValidateUtil.isEmpty($scope.newCustomer.contactNumber)){PopupService.errorMessage("请录入手机号码.");return false;}
+      if(ValidateUtil.isEmpty($scope.newCustomer.birthDate)){PopupService.errorMessage("请录入生日日期.");return false;}
+      var promise = CustomerService.createCustomer($scope.newCustomer);
+      promise.then(function(data){
+        if(ServiceUtil.isError(data)){
+          PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+          return false;
+        }
+        PopupService.successMessage("创建新客户成功.");
+        $scope.closeModal();
+      },function(data){
+        PopupService.errorMessage("创建用户出错,检查网络,或稍候重试."+data);
+      });
     }
     //TODO hard code productStoreId
     //var data = {productStoreId:'SHOWROOM-161-E'};
     var data = {viewIndex:0,viewSize:5};
-    var promise = CustomerService.findCustomerWebPos(data);
+    var promise = CustomerService.findCustomer(data);
     promise.then(
       function(data){
         if(ServiceUtil.isError(data)){
@@ -267,6 +319,7 @@ angular.module('iPosApp.controllers',[])
       $scope.modal.show();
     }
     $scope.closeModal = function(){
+      $scope.initNewCustomerData();
       $scope.modal.hide();
     }
     $scope.setCustomerToCart = function(customer){

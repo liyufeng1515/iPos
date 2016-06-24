@@ -25,13 +25,59 @@ angular.module("iPosApp.services",[])
       }
     }
   })
+    .service('GeoService',function($http,$q,ConfigService){
+      return {
+        getProvinceGeo:function(){
+          var deferred = $q.defer();
+          var data = {geoId:'CHN',geoAssocTypeId:'REGIONS'}
+          $http({
+            method:'POST',
+            url:ConfigService.getHostURL()+"getChildGeoInfo",
+            data:data
+          }).success(function(data,status,header,config){
+            deferred.resolve(data);
+          }).error(function(data,status,header,config){
+            deferred.reject(data);
+          });
+          return deferred.promise;
+        },
+        getCityGeo:function(data){
+          var deferred = $q.defer();
+          data.geoAssocTypeId = 'PROVINCE_CITY';
+          $http({
+            method:'POST',
+            url:ConfigService.getHostURL()+'getChildGeoInfo',
+            data:data
+          }).success(function(data,status,header,config){
+            deferred.resolve(data);
+          }).error(function(data,status,header,config){
+            deferred.reject(data);
+          });
+          return deferred.promise;
+        },
+        getCountyGeo:function(data){
+          var deferred = $q.defer();
+          data.geoAssocTypeId = 'CITY_COUNTY';
+          $http({
+            method:'POST',
+            url:ConfigService.getHostURL()+'getChildGeoInfo',
+            data:data
+          }).success(function(data,status,header,config){
+            deferred.resolve(data);
+          }).error(function(data,status,header,config) {
+            deferred.reject(data);
+          });
+          return deferred.promise;
+        }
+      }
+    })
   .service('CartService',function($http,$q,ConfigService){
     return {
       setCustomerToCart:function(data){
         var deferred = $q.defer();
         $http({
           method:'POST',
-          url:ConfigService.getHostURL()+"SetPosPartyToCart",
+          url:ConfigService.getHostURL()+"setPartyToCart",
           data:data
         }).success(function(data,status,header,config){
           deferred.resolve(data);
@@ -83,11 +129,24 @@ angular.module("iPosApp.services",[])
   })
   .service('CustomerService',function($http,$q,ConfigService){
     return {
-      findCustomerWebPos:function(data){
+      findCustomer:function(data){
         var deferred = $q.defer();
         $http({
           method:'POST',
           url:ConfigService.getHostURL()+"findCustomerWebPos",
+          data:data
+        }).success(function(data,status,header,config){
+          deferred.resolve(data);
+        }).error(function(data,status,header,config){
+          deferred.reject(data);
+        });
+        return deferred.promise;
+      },
+      createCustomer:function(data){
+        var deferred = $q.defer();
+        $http({
+          method:'POST',
+          url:ConfigService.getHostURL()+"createCustomerWebPos",
           data:data
         }).success(function(data,status,header,config){
           deferred.resolve(data);
@@ -176,6 +235,11 @@ angular.module("iPosApp.services",[])
           }else{
             return false;
           }
+        },
+        isEmpty:function(data){
+          for(var i in data)
+            if(data.hasOwnProperty(i)) return false;
+          return true;
         }
       }
     })
