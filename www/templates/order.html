@@ -1,0 +1,57 @@
+<ion-view view-title="订单列表">
+  <ion-content>
+    <div class="card">
+      <div class="list">
+        <div class="item item-input-inset">
+          <label class="item-input-wrapper col-10">
+            <input type="text" ng-model="findData.orderId" placeholder="查询订单编号">
+          </label>
+          <label>&nbsp;&nbsp;</label>
+          <label class="item-input-wrapper col-10">
+            <input type="text" ng-model="findData.cardId" placeholder="查询客户编号">
+          </label>
+          <label>&nbsp;&nbsp;</label>
+          <label class="item-input-wrapper col-10">
+            <input type="text" ng-model="findData.personName" placeholder="查询客户名称">
+          </label>
+          <label>&nbsp;&nbsp;</label>
+          <label class="item-input-wrapper col-20">
+            <ionic-datepicker date="pickDate" callback="fromDatePickerCallback">
+              <button class="button button-block button-calm"> 查询该日期之后: {{ findData.fromDate | date:'yyyy-MM-dd' }}</button>
+            </ionic-datepicker>
+            <!--<input type="text" ng-model="findData.fromDate" placeholder="查询该日期之后">-->
+          </label>
+          <label>&nbsp;&nbsp;</label>
+          <label class="item-input-wrapper col-20">
+            <ionic-datepicker date="pickDate" callback="thruDatePickerCallback">
+              <button class="button button-block button-calm"> 查询该日期之前: {{ findData.thruDate | date:'yyyy-MM-dd' }}</button>
+            </ionic-datepicker>
+            <!--<input type="text" ng-model="findData.thruDate" placeholder="查询该日期之前">-->
+          </label>
+
+          <button class="button button-small col-10" ng-click="findOrderList(findData)">
+            <h3>查 询</h3>
+          </button>
+        </div>
+        <div class="item">
+          <div class="list">
+            <div class="item item-stable row">
+              <div class="col">订单编号</div>
+              <div class="col">订单日期</div>
+              <div class="col">客户名称</div>
+              <div class="col">订单金额</div>
+              <div class="col">订单状态</div>
+            </div>
+            <div class="item row" ng-repeat="order in orderList">
+              <div class="col">{{order.orderId}}</div>
+              <div class="col">{{order.orderDate}}</div>
+              <div class="col">{{order.firstName}}</div>
+              <div class="col">{{order.grandTotal}})</div>
+              <div class="col">{{order.description}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

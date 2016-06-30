@@ -8,13 +8,13 @@
         </button>
         <div class="item item-input-inset">
           <label class="item-input-wrapper col-20">
-            <input type="text" placeholder="客户编号">
+            <input type="text" ng-model="findData.partyId" placeholder="客户编号">
           </label>
           <label>&nbsp;&nbsp;</label>
           <label class="item-input-wrapper col-20">
-            <input type="text" placeholder="客户名称">
+            <input type="text" ng-model="findData.personName" placeholder="客户名称">
           </label>
-          <button class="button button-small col-10">
+          <button class="button button-small col-10" ng-click="findCustomerList(findData)">
             <h3>查 询</h3>
           </button>
         </div>
@@ -139,8 +139,8 @@
                 </div>
                 <div class="col col-50 col-center">
                   <ionic-datepicker date="pickDate" callback="datePickerCallback">
-                  <button class="button button-block button-calm"> 选择生日: {{ newCustomer.birthDate | date:'yyyy-MM-dd' }}</button>
-                </ionic-datepicker>
+                    <button class="button button-block button-calm"> 选择生日: {{ newCustomer.birthDate | date:'yyyy-MM-dd' }}</button>
+                  </ionic-datepicker>
                 </div>
               </div>
             </div>

@@ -136,7 +136,7 @@ angular.module('iPosApp.controllers',[])
          $rootScope.cartProducts = [];
          $scope.initCartData();
        },function(data){
-        PopupService.errorMessage("创建出现错误,检查网络,或稍候重试."+data);
+        PopupService.errorMessage("创建出现错误,检查网络,或稍候重试.");
        });
     }
     $scope.checkout = function(){
@@ -160,7 +160,7 @@ angular.module('iPosApp.controllers',[])
               }
               PopupService.successMessage("支付成功,请确认发货仓库并确认结算.");
             },function(data){
-              PopupService.errorMessage("支付出现错误,检查网络,或稍候重试."+data);
+              PopupService.errorMessage("支付出现错误,检查网络,或稍候重试.");
             });
           }
         });
@@ -189,11 +189,11 @@ angular.module('iPosApp.controllers',[])
            }else if(data._ERROR_MESSAGE_){
              PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
            }else{
-             PopupService.errorMessage("网络异常."+data);
+             PopupService.errorMessage("网络异常.");
            }
          },
          function(data){
-           PopupService.errorMessage("登录出现错误,检查网络,或稍候重试."+data);
+           PopupService.errorMessage("登录出现错误,检查网络,或稍候重试.");
          });
       }
     };
@@ -208,7 +208,7 @@ angular.module('iPosApp.controllers',[])
         $scope.catalogList = data.listIt;
       },
       function(data){
-        PopupService.errorMessage("查找目录商品出现错误,检查网络,或稍候重试."+data);
+        PopupService.errorMessage("查找目录商品出现错误,检查网络,或稍候重试.");
       });
 
     $scope.openModal = function(it) {
@@ -237,7 +237,7 @@ angular.module('iPosApp.controllers',[])
           PopupService.successMessage("成功添加商品到购物车.");
           $rootScope.initCartProducts(it);
         }, function(data){
-          PopupService.errorMessage("添加商品出现错误,检查网络,或稍候重试."+data);
+          PopupService.errorMessage("添加商品出现错误,检查网络,或稍候重试.");
         });
     }
     $scope.$on('modal.removed', function() {
@@ -247,10 +247,26 @@ angular.module('iPosApp.controllers',[])
   })
 
   .controller('CustomerCtrl',function($filter,$ionicModal,$state,$rootScope,$http,$scope,CustomerService,CartService,PopupService,GeoService,ServiceUtil,ValidateUtil){
-    //init data
+    $scope.findData = {viewIndex:0,viewSize:100};
+    $scope.findCustomerList = function(data){
+      var promise = CustomerService.findCustomerList(data);
+      promise.then(
+          function(data){
+            if(ServiceUtil.isError(data)){
+              PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+              return false;
+            }
+            $scope.customerList = data.listIt;
+          },
+          function(data){
+            PopupService.errorMessage("查找客户出现错误,检查网络,或稍候重试.");
+          });
+    }
     $scope.initNewCustomerData = function(){
       $scope.newCustomer = {gender:'F'};
     }
+    //init data
+    $scope.findCustomerList($scope.findData);
     $scope.initNewCustomerData();
     var promise = GeoService.getProvinceGeo();
     promise.then(function(data){
@@ -262,6 +278,7 @@ angular.module('iPosApp.controllers',[])
     },function(data){
       PopupService.errorMessage('获取省份列表失败,检查网络或稍候重试.');
     });
+
     //watch data
     $scope.$watch('newCustomer.province', function(newVal) {
       if(newVal)GeoService.getCityGeo({geoId:newVal}).then(function(data){$scope.cityList=data.geoInfoList;$scope.countyList={};});
@@ -290,24 +307,10 @@ angular.module('iPosApp.controllers',[])
         PopupService.successMessage("创建新客户成功.");
         $scope.closeModal();
       },function(data){
-        PopupService.errorMessage("创建用户出错,检查网络,或稍候重试."+data);
+        PopupService.errorMessage("创建用户出错,检查网络,或稍候重试.");
       });
     }
-    //TODO hard code productStoreId
-    //var data = {productStoreId:'SHOWROOM-161-E'};
-    var data = {viewIndex:0,viewSize:5};
-    var promise = CustomerService.findCustomer(data);
-    promise.then(
-      function(data){
-        if(ServiceUtil.isError(data)){
-          PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
-          return false;
-        }
-        $scope.customerList = data.listIt;
-      },
-      function(data){
-        PopupService.errorMessage("查找客户出现错误,检查网络,或稍候重试."+data);
-      });
+
     $ionicModal.fromTemplateUrl("editCustomer.html", {
       scope: $scope,
       animation: 'slide-in-up',
@@ -315,13 +318,16 @@ angular.module('iPosApp.controllers',[])
     }).then(function(modal) {
       $scope.modal = modal;
     });
+
     $scope.editCustomer = function(customer){
       $scope.modal.show();
     }
+
     $scope.closeModal = function(){
       $scope.initNewCustomerData();
       $scope.modal.hide();
     }
+
     $scope.setCustomerToCart = function(customer){
       var data = {'partyId':customer.partyId};
       //var demoCustomer = {"timecardAccountTypeId":"null","cardId":"null","lastName":"null","partyClassificationGroupId":"CommonClassification","contactNumber":"13333333333","groupName":"测试客户2","classThruDate":"null","availableBalanceTotal":"null","partyTypeId":"PARTY_GROUP","actualBalanceTotal":"null","roleTypeId":"CUSTOMER","partyId":"198721","description":"SHOWROOM客户类型","classFromDate":"2016-04-06 14:33:25.0","timecardAccountId":"null","firstName":"测试客户2","createdDate":"2016-04-06 14:33:25.0","ownerPartyId":"null"};
@@ -335,10 +341,31 @@ angular.module('iPosApp.controllers',[])
           }
           $rootScope.customer=customer;
           $state.go("app.home",{}, {reload:true});
-        },
-        function(data){
-          PopupService.errorMessage("选择客户出现错误,检查网络,或稍候重试."+data);
+        }, function(data){
+          PopupService.errorMessage("选择客户出现错误,检查网络,或稍候重试.");
         });
     }
+
+
+  })
+  .controller('OrderCtrl',function($scope,$filter,ServiceUtil,OrderService,PopupService){
+    $scope.findData = {viewIndex:0,viewSize:100};
+    $scope.findOrderList = function(data){
+      var promise = OrderService.findOrderList(data);
+      promise.then(function(data){
+        if(ServiceUtil.isError(data)){
+          PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+          return false;
+        }
+        $scope.orderList = data.listIt;
+      },function(data){
+        PopupService.errorMessage("获取订单列表出现错误,检查网络,或稍候重试.");
+      });
+    }
+    //init
+    $scope.findOrderList($scope.findData);
+    $scope.pickDate = new Date();
+    $scope.fromDatePickerCallback = function (val) {if (val) $scope.findData.fromDate = $filter('date')(val,'yyyy-MM-dd');}
+    $scope.thruDatePickerCallback = function (val) {if (val) $scope.findData.thruDate = $filter('date')(val,'yyyy-MM-dd');}
   })
 ;

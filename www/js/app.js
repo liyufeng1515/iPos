@@ -63,6 +63,16 @@ angular.module('iPosApp', ['ionic','iPosApp.controllers','ngResource','iPosApp.s
           }
         }
       })
+
+      .state('app.order',{
+        url:'/order',
+        views: {
+          'menuContent':{
+            templateUrl:'templates/order.html',
+            controller:'OrderCtrl'
+          }
+        }
+      })
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/login');
     // Use x-www-form-urlencoded Content-Type
