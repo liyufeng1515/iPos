@@ -348,7 +348,7 @@ angular.module('iPosApp.controllers',[])
 
 
   })
-  .controller('OrderCtrl',function($scope,$filter,ServiceUtil,OrderService,PopupService){
+  .controller('OrderCtrl',function($scope,$filter,$ionicModal,ServiceUtil,OrderService,PopupService){
     $scope.findData = {viewIndex:0,viewSize:100};
     $scope.findOrderList = function(data){
       var promise = OrderService.findOrderList(data);
@@ -367,5 +367,31 @@ angular.module('iPosApp.controllers',[])
     $scope.pickDate = new Date();
     $scope.fromDatePickerCallback = function (val) {if (val) $scope.findData.fromDate = $filter('date')(val,'yyyy-MM-dd');}
     $scope.thruDatePickerCallback = function (val) {if (val) $scope.findData.thruDate = $filter('date')(val,'yyyy-MM-dd');}
+
+    $ionicModal.fromTemplateUrl("orderDetail.html",{
+      scope:$scope,
+      animation:'slide-in-up',
+      backdropClickToClose:false
+    }).then(function(modal){
+      $scope.modal = modal;
+    });
+
+    $scope.showOrderDetail = function(orderId){
+      var data ={orderId:orderId};
+      var promise = OrderService.getOrderDetail(data);
+      promise.then(function(data){
+        if(ServiceUtil.isError(data)){
+          PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+          return false;
+        }
+        $scope.orderDetail = data;
+        $scope.modal.show();
+      },function(data){
+        PopupService.errorMessage("获取订单详细出现错误,检查网络,或稍候重试.");
+      });
+    }
+    $scope.closeModal = function(){
+      $scope.modal.hide();
+    }
   })
 ;

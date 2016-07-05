@@ -188,6 +188,19 @@ angular.module("iPosApp.services",[])
             deffered.reject(data);
           });
           return deffered.promise;
+        },
+        getOrderDetail:function(data){
+          var deffered = $q.defer();
+          $http({
+            method:"POST",
+            url:ConfigService.getHostURL()+"getSalesOrderDetail",
+            data:data
+          }).success(function(data,status,header,config){
+            deffered.resolve(data);
+          }).error(function(data,status,header,config){
+            deffered.reject(data);
+          });
+          return deffered.promise;
         }
       }
     })

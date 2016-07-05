@@ -42,7 +42,7 @@
               <div class="col">订单金额</div>
               <div class="col">订单状态</div>
             </div>
-            <div class="item row" ng-repeat="order in orderList">
+            <div class="item row" ng-repeat="order in orderList" ng-click="showOrderDetail(order.orderId)">
               <div class="col">{{order.orderId}}</div>
               <div class="col">{{order.orderDate}}</div>
               <div class="col">{{order.firstName}}</div>
@@ -55,3 +55,39 @@
     </div>
   </ion-content>
 </ion-view>
+<script id="orderDetail.html" type="text/ng-template">
+  <ion-modal-view class="card">
+    <ion-header-bar class="stable-bg">
+      <h1 class="title">订单详情</h1>
+      <button class="button button-icon ion-close-round" ng-click="closeModal()"></button>
+    </ion-header-bar>
+    <ion-content>
+      <div class="card stable-bg">
+        <div class="row">订单编号: {{orderDetail.orderHeader.orderId}}</div>
+        <div class="row">订单日期: {{orderDetail.orderHeader.orderDate}}</div>
+        <div class="row">订单金额: {{orderDetail.orderHeader.grandTotal}}</div>
+        <div class="row">订单状态: {{orderDetail.orderHeader.statusId}}</div>
+        <div class="row">客户编号: {{orderDetail.billToParty.partyId}}</div>
+        <div class="row">客户名称: {{orderDetail.billToParty.lastName}}{{orderDetail.billToParty.firstName}}{{orderDetail.billToParty.groupName}}</div>
+      </div>
+      <div class="list card">
+        <div class="item row stable-bg">
+          <div class="col">订单项编号</div>
+          <div class="col">产品编号</div>
+          <div class="col">产品名称</div>
+          <div class="col">产品组别</div>
+          <div class="col">数量</div>
+          <div class="col">价格</div>
+        </div>
+        <div class="item row" ng-repeat="orderItem in orderDetail.orderItems">
+          <div class="col">{{orderItem.orderItemSeqId}}</div>
+          <div class="col">{{orderItem.productId}}</div>
+          <div class="col">{{orderItem.productName}}</div>
+          <div class="col">{{orderItem.groupName}}</div>
+          <div class="col">{{orderItem.quantity}}</div>
+          <div class="col">{{orderItem.unitPrice}}</div>
+        </div>
+      </div>
+    </ion-content>
+  </ion-modal-view>
+</script>
