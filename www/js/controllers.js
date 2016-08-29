@@ -304,6 +304,8 @@ angular.module('iPosApp.controllers',[])
           PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
           return false;
         }
+        $scope.findCustomerList($scope.findData);
+        $scope.initNewCustomerData();
         PopupService.successMessage("创建新客户成功.");
         $scope.closeModal();
       },function(data){
@@ -324,7 +326,6 @@ angular.module('iPosApp.controllers',[])
     }
 
     $scope.closeModal = function(){
-      $scope.initNewCustomerData();
       $scope.modal.hide();
     }
 
