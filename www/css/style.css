@@ -7,6 +7,23 @@
     left: 20%;
     min-height: 500px;
     width: 60%; }
+.home-modal {
+    top: 10%;
+    right: 20%;
+    bottom: 20%;
+    left: 20%;
+    min-height: 500px;
+    width: 60%; }
+.home-input-font{
+    font-size: 2em !important ;
+    font-weight:900;color: #111 !important;
+}
+.background-image-none{
+    background-image:none;!important;
+}
+.ipad-screen-height{
+    height: 550px;
+}
 /*override datepicker css*/
 ._720kb-datepicker-calendar._720kb-datepicker-open,._720kb-datepicker-calendar._720kb-datepicker-forced-to-open {
     visibility: visible;
