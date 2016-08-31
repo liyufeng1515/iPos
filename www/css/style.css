@@ -9,14 +9,15 @@
     width: 60%; }
 .home-modal {
     top: 10%;
-    right: 20%;
-    bottom: 20%;
-    left: 20%;
+    right: 5%;
+    bottom: 10%;
+    left: 5%;
     min-height: 500px;
-    width: 60%; }
+    width: 90%; }
 .home-input-font{
     font-size: 2em !important ;
-    font-weight:900;color: #111 !important;
+    font-weight:900;
+    color: #111 !important;
 }
 .background-image-none{
     background-image:none;!important;

@@ -55,7 +55,7 @@ angular.module('iPosApp.controllers',[])
     }, 1000);
   };
 })
-  .controller('HomeCtrl',function($scope,$rootScope,$state,PopupService,CartService,ServiceUtil,ValidateUtil){
+  .controller('HomeCtrl',function($scope,$rootScope,$state,$ionicModal,PopupService,CartService,ServiceUtil,ValidateUtil){
     //init scope data //TODO demo data
     $scope.paymentTypeList = [
       { text: "现金", value: "CASH" },
@@ -66,6 +66,17 @@ angular.module('iPosApp.controllers',[])
       { text: "成衣仓", value: "ZUCZUG_CLOTHESFACILITY" },
       { text: "demo别选我3", value: "ZUCZUG_CLOTHESFACILITY3" },
     ];
+    $ionicModal.fromTemplateUrl("checkout.html", {
+      scope: $scope,
+      animation: 'slide-in-up',
+      backdropClickToClose:false
+    }).then(function(modal) {
+      $scope.modal = modal;
+    });
+    $scope.closeModal = function() {
+      $scope.modal.hide();
+      $scope.cart.mainNum = ".";
+    };
     $scope.initCartData = function(){
       $scope.cart = {
         facilityId:'ZUCZUG_CLOTHESFACILITY',
@@ -116,6 +127,7 @@ angular.module('iPosApp.controllers',[])
     $scope.goCustomerPage = function(){
       $state.go("app.customer",{},{reload:true});
     }
+
     $scope.createOrder = function(){
       //validate cusomer/product
       if(Object.keys($scope.cart.customer).length==0||$scope.cart.cartProducts.length==0){
@@ -140,6 +152,8 @@ angular.module('iPosApp.controllers',[])
        });
     }
     $scope.checkout = function(){
+      $scope.modal.show();
+      return false;
       //validate cusomer/product
       if(Object.keys($scope.cart.customer).length==0||$scope.cart.cartProducts.length==0){
         PopupService.errorMessage("请添加客户/商品到您的购物车,再尝试结算.");
