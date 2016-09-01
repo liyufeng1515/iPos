@@ -7,9 +7,13 @@ angular.module('iPosApp.controllers',[])
 
   $rootScope.initCartProducts = function(data){
     var itemIndex  = -1;
+    //TODO 此处totalAmount取值在接口完善的情况下需要换掉
+    $rootScope.totalAmount = 0;
     angular.forEach($rootScope.cartProducts,function(it,index,array){
+      $rootScope.totalAmount += it.price*it.quantity;
       if(it.productId == data.productId) itemIndex = index;
     });
+    $rootScope.totalAmount+=data.price;
     if(itemIndex==-1){
       data['quantity']=1;
       $rootScope.cartProducts.push(data);
@@ -59,12 +63,9 @@ angular.module('iPosApp.controllers',[])
     //init scope data //TODO demo data
     $scope.paymentTypeList = [
       { text: "现金", value: "CASH" },
-      { text: "demo别选我", value: "CASH1" },
-      { text: "demo别选我2", value: "CASH2" },
     ];
     $scope.facilityIdList = [
       { text: "成衣仓", value: "ZUCZUG_CLOTHESFACILITY" },
-      { text: "demo别选我3", value: "ZUCZUG_CLOTHESFACILITY3" },
     ];
     $ionicModal.fromTemplateUrl("checkout.html", {
       scope: $scope,
@@ -82,6 +83,7 @@ angular.module('iPosApp.controllers',[])
         facilityId:'ZUCZUG_CLOTHESFACILITY',
         checkOutPaymentIdInfo:'CASH',
         mainNum:".",
+        totalAmount:$rootScope.totalAmount,
         customer:$rootScope.customer,
         cartProducts:$rootScope.cartProducts
       };
@@ -151,9 +153,13 @@ angular.module('iPosApp.controllers',[])
         PopupService.errorMessage("创建出现错误,检查网络,或稍候重试.");
        });
     }
+    $scope.openCheckoutModal = function(){
+      var checkoutConfirm = PopupService.confirmMessage("发货仓库为:<br/>&nbsp;"+$scope.cart.facilityId+"<br/>确认去结算订单吗?");
+      checkoutConfirm.then(function(data){
+        if(data)$scope.modal.show();
+      })
+    }
     $scope.checkout = function(){
-      $scope.modal.show();
-      return false;
       //validate cusomer/product
       if(Object.keys($scope.cart.customer).length==0||$scope.cart.cartProducts.length==0){
         PopupService.errorMessage("请添加客户/商品到您的购物车,再尝试结算.");
@@ -161,9 +167,8 @@ angular.module('iPosApp.controllers',[])
       }
       //validate amout
       if(ValidateUtil.isNumber($scope.cart.mainNum)){
-        var checkoutConfirm = PopupService.confirmMessage("当前支付方式为:"+$scope.cart.checkOutPaymentIdInfo+",确认支付吗?");
+        var checkoutConfirm = PopupService.confirmMessage("支付方式为:&nbsp;"+$scope.cart.checkOutPaymentIdInfo+"<br/>支付金额为:&nbsp;"+$scope.cart.mainNum+"<br/>确认支付吗?");
         checkoutConfirm.then(function(data){
-          $scope.showCartDetail();
           if(data){
             var data = {checkOutPaymentIdInfo:$scope.cart.checkOutPaymentIdInfo,preTotal_CASH:$scope.cart.mainNum}
             var promise = CartService.checkout(data);
@@ -172,7 +177,8 @@ angular.module('iPosApp.controllers',[])
                 PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
                 return false;
               }
-              PopupService.successMessage("支付成功,请确认发货仓库并确认结算.");
+              PopupService.successMessage("支付成功,确认创建订单中...");
+              $scope.createOrder();
             },function(data){
               PopupService.errorMessage("支付出现错误,检查网络,或稍候重试.");
             });
