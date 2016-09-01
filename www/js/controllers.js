@@ -146,14 +146,21 @@ angular.module('iPosApp.controllers',[])
          PopupService.successMessage("创建订单成功.");
          //clear/init data
          $scope.closeCartDetail();
+         $scope.closeModal();
          $rootScope.customer = {};
          $rootScope.cartProducts = [];
+         $rootScope.totalAmount = 0;
          $scope.initCartData();
        },function(data){
         PopupService.errorMessage("创建出现错误,检查网络,或稍候重试.");
        });
     }
     $scope.openCheckoutModal = function(){
+      //validate cusomer/product
+      if(Object.keys($scope.cart.customer).length==0||$scope.cart.cartProducts.length==0){
+        PopupService.errorMessage("请添加客户/商品到您的购物车,再尝试结算.");
+        return false;
+      }
       var checkoutConfirm = PopupService.confirmMessage("发货仓库为:<br/>&nbsp;"+$scope.cart.facilityId+"<br/>确认去结算订单吗?");
       checkoutConfirm.then(function(data){
         if(data)$scope.modal.show();
