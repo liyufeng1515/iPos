@@ -99,6 +99,19 @@ angular.module("iPosApp.services",[])
           });
           return deferred.promise;
         },
+        updateInfoCartItem:function(data){
+          var deferred = $q.defer();
+          $http({
+            method:'POST',
+            url:ConfigService.getHostURL()+"updateInfoCartItem",
+            data:data
+          }).success(function(data,status,header,config){
+            deferred.resolve(data);
+          }).error(function(data,status,header,config){
+            deferred.reject(data);
+          });
+          return deferred.promise;
+        },
         checkout:function(data){
           var deferred = $q.defer();
           $http({

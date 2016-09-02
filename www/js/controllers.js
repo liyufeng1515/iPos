@@ -5,7 +5,7 @@ angular.module('iPosApp.controllers',[])
   $rootScope.cartProducts = [];
   $rootScope.customer = {};
 
-  $rootScope.initCartProducts = function(data){
+  $rootScope.initCartProducts = function(data,quantity){
     var itemIndex  = -1;
     //TODO 此处totalAmount取值在接口完善的情况下需要换掉
     $rootScope.totalAmount = 0;
@@ -15,10 +15,13 @@ angular.module('iPosApp.controllers',[])
     });
     $rootScope.totalAmount+=data.price;
     if(itemIndex==-1){
-      data['quantity']=1;
+      data['quantity']=quantity;
       $rootScope.cartProducts.push(data);
     }else{
-      $rootScope.cartProducts[itemIndex].quantity += 1;
+      if($rootScope.cartProducts[itemIndex].quantity+quantity<=0){
+        return "购物车数量不足."
+      }
+      $rootScope.cartProducts[itemIndex].quantity += quantity;
     }
   }
   // With the new view caching in Ionic, Controllers are only called
@@ -79,6 +82,7 @@ angular.module('iPosApp.controllers',[])
       $scope.cart.mainNum = ".";
     };
     $scope.initCartData = function(){
+      $scope.disabled = false;//该状态作用:防止按钮多次提交
       $scope.cart = {
         facilityId:'ZUCZUG_CLOTHESFACILITY',
         checkOutPaymentIdInfo:'CASH',
@@ -196,6 +200,33 @@ angular.module('iPosApp.controllers',[])
         return false;
       }
     }
+    $scope.changeQuantity = function(it,quantity){
+      $scope.disabled = true;
+      var newQuantity = it.quantity+quantity;
+      if(newQuantity<=0){
+        PopupService.errorMessage("购物车数量不足.");
+        return false;
+      }
+      var data = {newVal:newQuantity,nowProductId:it.productId};
+      var promise = CartService.updateInfoCartItem(data);
+      promise.then(
+          function(data){
+            if(ServiceUtil.isError(data)){
+              PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
+              return false;
+            }
+            PopupService.successMessage("修改商品数量成功.");
+            var message = $rootScope.initCartProducts(it,quantity);
+            if(message){
+              PopupService.errorMessage(message);
+              return false;
+            }
+            $scope.initCartData();
+          }, function(data){
+            PopupService.errorMessage("修改商品数量错误,检查网络,或稍候重试.");
+          });
+    }
+
   })
 
   .controller('LoginCtrl',function($http,$scope,$state,PopupService,LoginService,ServiceUtil){
@@ -253,8 +284,8 @@ angular.module('iPosApp.controllers',[])
       $scope.modal.remove();
     };
     $scope.addProcutToCart = function(it){
-      var demoData = {quantity:1,add_product_id:'E161BA06-10-F'};
-      var promise = CartService.addProcutToCart(demoData);
+      var data = {quantity:1,add_product_id:it.productId};
+      var promise = CartService.addProcutToCart(data);
       promise.then(
         function(data){
           if(ServiceUtil.isError(data)){
@@ -262,7 +293,7 @@ angular.module('iPosApp.controllers',[])
             return false;
           }
           PopupService.successMessage("成功添加商品到购物车.");
-          $rootScope.initCartProducts(it);
+          $rootScope.initCartProducts(it,1);
         }, function(data){
           PopupService.errorMessage("添加商品出现错误,检查网络,或稍候重试.");
         });
