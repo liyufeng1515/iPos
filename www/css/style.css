@@ -12,10 +12,10 @@
     right: 5%;
     bottom: 10%;
     left: 5%;
-    min-height: 400px;
+    min-height: 500px;
     width: 90%; }
 .home-input-font{
-    font-size: 1.5em !important ;
+    font-size: 1.2em !important ;
     font-weight:900;
     color: #111 !important;
 }
@@ -23,7 +23,7 @@
     background-image:none;!important;
 }
 .ipad-screen-height{
-    height: 550px;
+    height: 600px;
 }
 /*override datepicker css*/
 ._720kb-datepicker-calendar._720kb-datepicker-open,._720kb-datepicker-calendar._720kb-datepicker-forced-to-open {

@@ -27,13 +27,6 @@
               <div class="col">积分</div>
               <div class="col">创建日期</div>
             </div>
-            <div class="item row" ng-click="setCustomerToCart()">
-              <div class="col">demo客户(点我会报错)</div>
-              <div class="col">W1234</div>
-              <div class="col">15618266453</div>
-              <div class="col">1000</div>
-              <div class="col">2015-01-01 00:00:00</div>
-            </div>
             <div class="item row" ng-repeat="customer in customerList" ng-click="setCustomerToCart(customer)">
               <div class="col">{{customer.lastName=='null'?'':customer.lastName}}{{customer.firstName=='null'?'':customer.firstName}}</div>
               <div class="col">{{customer.cardId=='null'?'':customer.cardId}}</div>
