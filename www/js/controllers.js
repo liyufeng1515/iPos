@@ -205,6 +205,7 @@ angular.module('iPosApp.controllers',[])
       var newQuantity = it.quantity+quantity;
       if(newQuantity<=0){
         PopupService.errorMessage("购物车数量不足.");
+        $scope.disabled = false;
         return false;
       }
       var data = {newVal:newQuantity,nowProductId:it.productId};
