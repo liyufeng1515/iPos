@@ -332,7 +332,7 @@ angular.module('iPosApp.controllers',[])
         promise.then(function(data){
           $scope['categorylist'+random] = data;
           if(!$scope['categorylist'+random]) return false;
-          var innerHtml = "<ion-item class=\"item-borderless\" ng-repeat=\"item in categorylist"+random+"\" ng-class=\"{active: item.attr.id==currentCategoryId}\">"
+          var innerHtml = "<ion-item class=\"item-borderless\" ng-repeat=\"item in categorylist"+random+" | filter:''\" ng-class=\"{active: item.attr.id==currentCategoryId}\">"
               +"<i ng-click=\"toggleCategory(item,$id)\" class=\"icon button-large {{item.opened?'ion-minus':'ion-plus'}}\"></i>"
               +"<span style=\"font-weight: 900;font-size:18px;\" ng-click=\"showProducts(item)\">&nbsp;{{item.title}}</span>"
               +"<sweet content=\"sweet_{{$id}}\"></sweet>"
