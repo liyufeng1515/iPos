@@ -1,9 +1,13 @@
 angular.module("iPosApp.services",[])
     .service('ConfigService',function(){
       var hostURL = "http://121.199.20.78:8080/tabletpos/control/";
+      var catalogURL = "http://121.199.20.78:8080/catalog/control/";
       var service = {
         getHostURL:function(){
           return hostURL;
+        },
+        getCatalogURL:function(){
+          return catalogURL;
         }
       }
       return service;
@@ -15,6 +19,19 @@ angular.module("iPosApp.services",[])
           $http({
             method:'POST',
             url:ConfigService.getHostURL()+"findCatalogAndProduct",
+            data:data
+          }).success(function(data,status,header,config){
+            deferred.resolve(data);
+          }).error(function(data,status,header,config){
+            deferred.reject(data);
+          });
+          return deferred.promise;
+        },
+        getCategoryList:function(data){
+          var deferred = $q.defer();
+          $http({
+            method:'POST',
+            url:ConfigService.getCatalogURL()+"getChild",
             data:data
           }).success(function(data,status,header,config){
             deferred.resolve(data);

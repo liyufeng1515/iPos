@@ -48,7 +48,7 @@ angular.module('iPosApp', ['ionic','iPosApp.controllers','ngResource','iPosApp.s
         url: '/catalog',
         views: {
           'menuContent':{
-            templateUrl: 'templates/catalog.html',
+            templateUrl: 'templates/store-catalog.html',
             controller: 'CatalogCtrl'
           }
         }
@@ -110,5 +110,16 @@ angular.module('iPosApp', ['ionic','iPosApp.controllers','ngResource','iPosApp.s
     }];
 
     //$httpProvider.defaults.withCredentials = true;
-  });
+  })
+    .directive('sweet', function($compile, $parse) {
+      return {
+        restrict: 'E',
+        link: function(scope, element, attr) {
+          scope.$watch(attr.content, function() {
+            element.html($parse(attr.content)(scope));
+            $compile(element.contents())(scope);
+          }, true);
+        }
+      }
+    });
 

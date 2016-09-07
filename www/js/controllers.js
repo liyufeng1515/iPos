@@ -258,9 +258,9 @@ angular.module('iPosApp.controllers',[])
     };
   })
 
-  .controller('CatalogCtrl',function($state,$rootScope,$scope,$ionicModal,PopupService,CatalogService,CartService,ServiceUtil){
+  .controller('CatalogCtrl',function($compile,$state,$rootScope,$scope,$ionicModal,PopupService,CatalogService,CartService,ServiceUtil){
     //TODO hard code productStoreId
-    var data = {productStoreId:'SHOWROOM-161-E'};
+    /*var data = {productStoreId:'SHOWROOM-161-E'};
     var promise = CatalogService.findCatalogAndProduct(data);
     promise.then(
       function(data){
@@ -268,7 +268,18 @@ angular.module('iPosApp.controllers',[])
       },
       function(data){
         PopupService.errorMessage("查找目录商品出现错误,检查网络,或稍候重试.");
-      });
+      });*/
+//    additionParam:','category
+  //  hrefString:EditCategory?productCategoryId=
+    //    onclickFunction:callDocument
+    var data = {isCategoryType:true,isCatalog:true,productCategoryId:'SHOWROOM-161-E'};
+    var promise = CatalogService.getCategoryList(data);
+    promise.then(function(data){
+      $scope.categoryList = data;
+    },function(data){
+      PopupService.errorMessage("获取目录数据出现错误,检查网络,或稍候重试.");
+    });
+
 
     $scope.openModal = function(it) {
       $scope.showCatalog = it;
@@ -303,6 +314,37 @@ angular.module('iPosApp.controllers',[])
       if($rootScope.cartProducts.length!=0)
         $state.go("app.home",{},{reload:true});
     });
+
+    //$scope.categoryList = [{name:'分类A',id:'SHOWROOM_163E_ROOT'}];
+    $scope.showProducts = function(category) {
+      $scope.currentCategoryId = category.attr.id;
+      //TODO get product list
+    };
+    //uid的作用:递归时动态设置sweet名字
+    //alert(Math.floor(Math.random()*1000000));
+    $scope.toggleCategory = function(category,uid) {
+      //六位随机数作用:动态设置ng-repeat所需名字,因为名字重复出现的话angurlar会报错Cannot read property 'insertBefore' of null
+      var random = Math.floor(Math.random()*100000);
+      category.opened = !category.opened;
+      if(category.opened){
+        var data = {isCategoryType:false,isCatalog:false,productCategoryId:category.attr.id};
+        var promise = CatalogService.getCategoryList(data);
+        promise.then(function(data){
+          $scope['categorylist'+random] = data;
+          if(!$scope['categorylist'+random]) return false;
+          var innerHtml = "<ion-item class=\"item-borderless\" ng-repeat=\"item in categorylist"+random+"\" ng-class=\"{active: item.attr.id==currentCategoryId}\">"
+              +"<i ng-click=\"toggleCategory(item,$id)\" class=\"icon button-large {{item.opened?'ion-minus':'ion-plus'}}\"></i>"
+              +"<span style=\"font-weight: 900;font-size:18px;\" ng-click=\"showProducts(item)\">&nbsp;{{item.title}}</span>"
+              +"<sweet content=\"sweet_{{$id}}\"></sweet>"
+              +"</ion-item>";
+          $scope['sweet_'+uid]=innerHtml;
+        },function(data){
+          PopupService.errorMessage("获取目录数据出现错误,检查网络,或稍候重试.");
+        });
+      }else{
+        $scope['sweet_'+uid]=null;
+      }
+    };
   })
 
   .controller('CustomerCtrl',function($filter,$ionicModal,$state,$rootScope,$http,$scope,CustomerService,CartService,PopupService,GeoService,ServiceUtil,ValidateUtil){

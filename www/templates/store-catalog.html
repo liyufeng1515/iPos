@@ -1,0 +1,20 @@
+<ion-view view-title="店 铺 目 录">
+  <ion-content>
+    <div class="card">
+      <div class="row">
+        <div class="col col-50">
+          <ion-list>
+            <ion-item class="item-borderless" ng-repeat="category in categoryList track by $index" ng-class="{active: category.attr.id==currentCategoryId}">
+              <i ng-click="toggleCategory(category,$id)" class="icon button-large {{category.opened?'ion-minus':'ion-plus'}}"></i>
+              <span style="font-weight: 900;font-size:18px;" ng-click="showProducts(category)">&nbsp;{{category.title}}&nbsp;</span>
+              <sweet content="sweet_{{$id}}"></sweet>
+            </ion-item>
+          </ion-list>
+        </div>
+        <div class="col">
+          产品区域
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>
