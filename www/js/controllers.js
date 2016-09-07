@@ -259,19 +259,6 @@ angular.module('iPosApp.controllers',[])
   })
 
   .controller('CatalogCtrl',function($compile,$state,$rootScope,$scope,$ionicModal,PopupService,CatalogService,CartService,ServiceUtil){
-    //TODO hard code productStoreId
-    /*var data = {productStoreId:'SHOWROOM-161-E'};
-    var promise = CatalogService.findCatalogAndProduct(data);
-    promise.then(
-      function(data){
-        $scope.catalogList = data.listIt;
-      },
-      function(data){
-        PopupService.errorMessage("查找目录商品出现错误,检查网络,或稍候重试.");
-      });*/
-//    additionParam:','category
-  //  hrefString:EditCategory?productCategoryId=
-    //    onclickFunction:callDocument
     var data = {isCategoryType:true,isCatalog:true,productCategoryId:'SHOWROOM-161-E'};
     var promise = CatalogService.getCategoryList(data);
     promise.then(function(data){
@@ -279,7 +266,6 @@ angular.module('iPosApp.controllers',[])
     },function(data){
       PopupService.errorMessage("获取目录数据出现错误,检查网络,或稍候重试.");
     });
-
 
     $scope.openModal = function(it) {
       $scope.showCatalog = it;
@@ -318,7 +304,16 @@ angular.module('iPosApp.controllers',[])
     //$scope.categoryList = [{name:'分类A',id:'SHOWROOM_163E_ROOT'}];
     $scope.showProducts = function(category) {
       $scope.currentCategoryId = category.attr.id;
-      //TODO get product list
+      //TODO hard code productStoreId
+      var data = {productStoreId:'SHOWROOM-161-E'};
+      var promise = CatalogService.findCatalogAndProduct(data);
+      promise.then(
+          function(data){
+            $scope.productList = data.listIt[0].productList;
+          },
+          function(data){
+            PopupService.errorMessage("查找目录商品出现错误,检查网络,或稍候重试.");
+          });
     };
     //uid的作用:递归时动态设置sweet名字
     //alert(Math.floor(Math.random()*1000000));

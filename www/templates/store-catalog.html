@@ -12,7 +12,20 @@
           </ion-list>
         </div>
         <div class="col">
-          产品区域
+          <ion-list>
+            <ion-item ng-repeat="it in productList" ng-click="addProcutToCart(it)">
+              <div class="row">
+                <div class="col text-center">
+                  <img src="{{it.smallImageUrl}}">
+                </div>
+                <div class="col">
+                  <h3 style="margin: 12px;">{{it.productId}}</h3>
+                  <h3 style="margin: 12px;">{{it.productName}}</h3>
+                  <h3 style="margin: 12px;">{{it.price}}</h3>
+                </div>
+              </div>
+            </ion-item>
+          </ion-list>
         </div>
       </div>
     </div>
