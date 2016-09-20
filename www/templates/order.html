@@ -45,8 +45,8 @@
             <div class="item row" ng-repeat="order in orderList" ng-click="showOrderDetail(order.orderId)">
               <div class="col">{{order.orderId}}</div>
               <div class="col">{{order.orderDate}}</div>
-              <div class="col">{{order.firstName}}</div>
-              <div class="col">{{order.grandTotal}})</div>
+              <div class="col">{{order.groupName=='null'?'':order.groupName}}{{order.lastName=='null'?'':order.lastName}}{{order.firstName=='null'?'':order.firstName}}</div>
+              <div class="col">{{order.grandTotal}}</div>
               <div class="col">{{order.description}}</div>
             </div>
           </div>
