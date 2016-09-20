@@ -85,6 +85,7 @@ angular.module('iPosApp.controllers',[])
       $scope.disabled = false;//该状态作用:防止按钮多次提交
       $scope.cart = {
         facilityId:'ZUCZUG_CLOTHESFACILITY',
+        facilityName:'成衣仓',
         checkOutPaymentIdInfo:'CASH',
         mainNum:".",
         totalAmount:$rootScope.totalAmount,
@@ -165,7 +166,7 @@ angular.module('iPosApp.controllers',[])
         PopupService.errorMessage("请添加客户/商品到您的购物车,再尝试结算.");
         return false;
       }
-      var checkoutConfirm = PopupService.confirmMessage("发货仓库为:<br/>&nbsp;"+$scope.cart.facilityId+"<br/>确认去结算订单吗?");
+      var checkoutConfirm = PopupService.confirmMessage("发货仓库为:<br/>&nbsp;"+$scope.cart.facilityName+"<br/>确认去结算订单吗?");
       checkoutConfirm.then(function(data){
         if(data)$scope.modal.show();
       })
@@ -216,7 +217,7 @@ angular.module('iPosApp.controllers',[])
               PopupService.errorMessage(ServiceUtil.getErrorMessage(data));
               return false;
             }
-            PopupService.successMessage("修改商品数量成功.");
+            //PopupService.successMessage("修改商品数量成功.");
             var message = $rootScope.initCartProducts(it,quantity);
             if(message){
               PopupService.errorMessage(message);
