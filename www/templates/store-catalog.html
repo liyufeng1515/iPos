@@ -1,31 +1,31 @@
 <ion-view view-title="店 铺 目 录">
-  <ion-content>
+  <ion-content scroll="false">
     <div class="card">
       <div class="row">
-        <div class="col col-50">
+        <div class="col col-40">
           <ion-list>
-            <ion-item class="item-borderless" ng-repeat="category in categoryList | filter:''" ng-class="{active: category.attr.id==currentCategoryId}">
-              <i ng-click="toggleCategory(category,$id)" class="icon button-large {{category.opened?'ion-minus':'ion-plus'}}"></i>
-              <span style="font-weight: 900;font-size:18px;" ng-click="showProducts(category)">&nbsp;{{category.title}}&nbsp;</span>
+            <ion-item class="item-borderless no-padding" ng-repeat="category in categoryList | filter:''" ng-class="{active: category.attr.id==currentCategoryId}">
+              <i ng-click="toggleCategory(category,$id)" class="icon no-padding {{category.opened?'ion-minus':'ion-plus'}}"></i>
+              <span style="font-weight: 900;font-size:12px;" ng-click="showProducts(category)">&nbsp;{{category.title}}&nbsp;</span>
               <sweet content="sweet_{{$id}}"></sweet>
             </ion-item>
           </ion-list>
         </div>
         <div class="col">
-          <ion-list>
-            <ion-item ng-repeat="it in productList" ng-click="addProcutToCart(it)">
-              <div class="row">
-                <div class="col text-center">
-                  <img src="{{it.smallImageUrl}}">
+          <div class="item item-body scroll scroll-y" style="height: 90%;overflow: scroll;">
+            <ul>
+              <li class="padding-bottom" style="float: left;width:33%;min-height: 100px;" ng-repeat="it in productList" ng-click="addProcutToCart(it)">
+                <div style="float: left">
+                  <img src="{{it.smallImageUrl}}"/>
                 </div>
-                <div class="col">
-                  <h3 style="margin: 12px;">{{it.productId}}</h3>
-                  <h3 style="margin: 12px;">{{it.productName}}</h3>
-                  <h3 style="margin: 12px;">{{it.price}}</h3>
+                <div style="float: left">
+                  <h6>{{it.productId}}</h6>
+                  <h6>{{it.productName}}</h6>
+                  <h6>{{it.price}}</h6>
                 </div>
-              </div>
-            </ion-item>
-          </ion-list>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
