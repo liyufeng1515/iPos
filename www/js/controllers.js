@@ -228,6 +228,13 @@ angular.module('iPosApp.controllers',[])
             PopupService.errorMessage("修改商品数量错误,检查网络,或稍候重试.");
           });
     }
+    $scope.doRefresh = function(showClearCartBtn){
+      $scope.showClearCartBtn = !showClearCartBtn;
+      $scope.$broadcast('scroll.refreshComplete');
+    }
+    $scope.clearCart = function(){
+      alert('清除购物车');
+    }
 
   })
 
