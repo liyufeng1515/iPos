@@ -1,31 +1,33 @@
 <ion-view view-title="店 铺 目 录">
   <ion-content scroll="false">
-    <div class="card">
-      <div class="row">
-        <div class="col col-40">
-          <ion-list>
-            <ion-item class="item-borderless no-padding" ng-repeat="category in categoryList | filter:''" ng-class="{active: category.attr.id==currentCategoryId}">
-              <i ng-click="toggleCategory(category,$id)" class="icon no-padding {{category.opened?'ion-minus':'ion-plus'}}"></i>
-              <span style="font-weight: 900;font-size:12px;" ng-click="showProducts(category)">&nbsp;{{category.title}}&nbsp;</span>
-              <sweet content="sweet_{{$id}}"></sweet>
-            </ion-item>
-          </ion-list>
-        </div>
-        <div class="col">
-          <div class="item item-body scroll scroll-y" style="height: 90%;overflow: scroll;">
-            <ul>
-              <li class="padding-bottom" style="float: left;width:33%;min-height: 100px;" ng-repeat="it in productList" ng-click="addProcutToCart(it)">
-                <div style="float: left">
-                  <img src="{{it.smallImageUrl}}"/>
-                </div>
-                <div style="float: left">
-                  <h6>{{it.productId}}</h6>
-                  <h6>{{it.productName}}</h6>
-                  <h6>{{it.price}}</h6>
-                </div>
-              </li>
-            </ul>
-          </div>
+    <div class="row">
+      <div class="col col-40 card">
+        <ion-list>
+          <ion-item class="item-borderless no-padding" ng-repeat="category in categoryList | filter:''" ng-class="{active: category.attr.id==currentCategoryId}">
+            <i ng-click="toggleCategory(category,$id)" class="icon no-padding {{category.opened?'ion-minus':'ion-plus'}}"></i>
+            <span style="font-weight: 900;font-size:12px;" ng-click="showProducts(category)">&nbsp;{{category.title}}&nbsp;</span>
+            <sweet content="sweet_{{$id}}"></sweet>
+          </ion-item>
+        </ion-list>
+      </div>
+      <div class="col card">
+        <div class="item item-body" style="min-height:600px;">
+          <ion-pane>
+            <ion-content>
+              <ul>
+                <li class="padding-bottom" style="float: left;width:33%;min-height: 100px;" ng-repeat="it in productList" ng-click="addProcutToCart(it)">
+                  <div style="float: left">
+                    <img src="{{it.smallImageUrl}}"/>
+                  </div>
+                  <div style="float: left">
+                    <h6 style="margin-top:1px">{{it.productId}}</h6>
+                    <h6>{{it.productName}}</h6>
+                    <h6>{{it.price}}</h6>
+                  </div>
+                </li>
+              </ul>
+            </ion-content>
+          </ion-pane>
         </div>
       </div>
     </div>
