@@ -62,7 +62,7 @@ angular.module('iPosApp.controllers',[])
     }, 1000);
   };
 })
-  .controller('HomeCtrl',function($scope,$rootScope,$state,$ionicModal,PopupService,CartService,ServiceUtil,ValidateUtil){
+  .controller('HomeCtrl',function($scope,$rootScope,$state,$ionicListDelegate,$ionicModal,PopupService,CartService,ServiceUtil,ValidateUtil){
     //init scope data //TODO demo data
     $scope.paymentTypeList = [
       { text: "现金", value: "CASH" },
@@ -244,6 +244,7 @@ angular.module('iPosApp.controllers',[])
       $rootScope.totalAmount -= it.price;
       $scope.cart.totalAmount = $rootScope.totalAmount;
       $scope.cart.cartProducts = $rootScope.cartProducts.splice($rootScope.cartProducts.indexOf(it),1);
+      $ionicListDelegate.closeOptionButtons();
     }
 
   })
