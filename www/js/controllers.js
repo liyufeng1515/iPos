@@ -233,12 +233,17 @@ angular.module('iPosApp.controllers',[])
       $scope.$broadcast('scroll.refreshComplete');
     }
     $scope.clearCart = function(){
-      $scope.cartProducts = {};
+      $rootScope.cartProducts = {};
+      $scope.cart.cartProducts = $rootScope.cartProducts;
+      $rootScope.totalAmount = 0;
+      $scope.cart.totalAmount = $rootScope.totalAmount;
       $scope.showClearCartBtn = false;
       PopupService.successMessage("清空购物车成功.");
     }
     $scope.deleteCartItem = function(it){
-      $scope.cartProducts.splice($scope.cartProducts.indexOf(it),1);
+      $rootScope.totalAmount -= it.price;
+      $scope.cart.totalAmount = $rootScope.totalAmount;
+      $scope.cart.cartProducts = $rootScope.cartProducts.splice($rootScope.cartProducts.indexOf(it),1);
     }
 
   })
