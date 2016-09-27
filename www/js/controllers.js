@@ -233,7 +233,12 @@ angular.module('iPosApp.controllers',[])
       $scope.$broadcast('scroll.refreshComplete');
     }
     $scope.clearCart = function(){
-      alert('清除购物车');
+      $scope.cartProducts = {};
+      $scope.showClearCartBtn = false;
+      PopupService.successMessage("清空购物车成功.");
+    }
+    $scope.deleteCartItem = function(it){
+      $scope.cartProducts.splice($scope.cartProducts.indexOf(it),1);
     }
 
   })
